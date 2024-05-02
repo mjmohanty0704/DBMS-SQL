@@ -1,6 +1,6 @@
 # SQL- Structure Query Language
-# DDL COMMANDS
-## CREATE, DROP, TRUNCATE
+## DDL COMMANDS
+## CREATE, DROP, TRUNCATE, ALTER
 
 ```SQL
 -- the keywords are case insensitive but the user defined names should be lowercase
@@ -44,6 +44,30 @@ create table orders(
     ON UPDATE CASCADE
     -- ON DELETE SET NULL
 );
+-- ADD COLUMNS
+alter table customers add column password VARCHAR(50) NOT NULL;
+
+alter table customers add column surname VARCHAR(50) NOT NULL after name;
+
+alter table customers
+add column pan_num VARCHAR(10) AFTER surname,
+add column joining_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+-- DELETE COLUMNS
+alter table customers drop column pan_number;
+
+alter table customers 
+drop column password,
+drop column joining_date;
+
+-- MODIFY COLUMN
+alter table customers modify column surname INTEGER;
+
+alter table customers add column age INTEGER NOT NULL;
+-- constraints cant be modified; they should be deleted and then added again with the desired modification
+alter table customers add constraint customer_age_check CHECK (age > 13);
+alter table customers drop constraint customer_age_check
+alter table customers add constraint customer_age_check CHECK (age > 6)
 ```
 
 **2. Transactions**
@@ -54,3 +78,91 @@ create table orders(
 
 - is a design technique tjat miniizes data redundancy and ensures data consistency by organizing data into separate tables.
 
+---
+
+## DML COMMANDS
+### INSERT, SELECT, UPDATE, DELETE
+---
+
+```sql
+CREATE DATABASE CX_DBMS;
+use CX_DBMS;
+CREATE TABLE users(
+	uid INTEGER primary key auto_increment,
+    name varchar(255) not null,
+    email varchar(255) not null unique,
+    password varchar(255) not null
+);
+
+insert into users
+values
+(NULL,'manisha','manisha@abc.com','2345'),
+(NULL,'dharma','dharma@abc.com','12344'),
+(NULL,'asha','asha@abc.com','12354');
+
+select * from users;
+```
+Given a dataset of smartphones, work on it using DML
+```sql
+select * from cx_dbms.smartphones where 1;
+select model, battery_capacity as mAh, os as operating_system from smartphones;
+
+select model, sqrt(resolution_width * resolution_width + resolution_height* resolution_height)/screen_size as 'ppi' from smartphones;
+
+select model, rating/10 as ratings from smartphones;
+
+select model, 'smartphone' as type from smartphones;
+
+select distinct(brand_name) as all_brands
+from smartphones;
+
+select distinct processor_brand as 'all processors'
+from smartphones;
+
+select distinct brand_name,processor_brand 
+from smartphones;
+
+select * from smartphones
+where brand_name = 'apple';
+
+select * from smartphones
+where price > 100000;
+
+select * from smartphones
+where price > 10000 and price < 20000;
+
+select * from smartphones
+where price between 10000 and 20000;
+
+select * from smartphones
+where rating > 80 and price < 25000;
+
+select * from smartphones
+where brand_name = 'samsung' and ram_capacity > 8;
+
+select * from smartphones
+where brand_name = 'samsung' and processor_brand = 'snapdragon';
+
+SELECT distinct brand_name from smartphones
+where price > 150000;
+
+select * from smartphones
+where processor_brand = 'snapdragon' or processor_brand = 'exynos' or processor_brand = 'bionic';
+
+select * from smartphones
+where processor_brand IN ('snapdragon','bionic','exynos','dimensity');
+
+update smartphones
+set processor_brand = 'samsung'
+where processor_brand = 'exynos';
+
+select * from smartphones
+where price > 200000;
+
+delete from smartphones
+where primary_camera_rear > 100 and brand_name = 'samsung';
+```
+### Order Of Execution of SQL Queries
+
+***From -> Join -> Where -> Group By -> Having -> Select -> Distinct -> Order By***
+- FRANK JOHN'S WICKED GRAVE HAUNTS SEVERAL DULL OWLS
