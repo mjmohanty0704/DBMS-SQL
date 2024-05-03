@@ -166,3 +166,187 @@ where primary_camera_rear > 100 and brand_name = 'samsung';
 
 ***From -> Join -> Where -> Group By -> Having -> Select -> Distinct -> Order By***
 - FRANK JOHN'S WICKED GRAVE HAUNTS SEVERAL DULL OWLS
+
+## TYPES OF FUNCTIONS
+### Built-in functions
+**1. Scalar functions** - are the functions which gives a value for each selected row.
+ 
+**2. Aggregate functions** - are the functions which gives only an individual value for the whole selected column.
+
+```sql
+select min(price) as min_price from smartphones;
+select max(price) as max_price from smartphones
+where brand_name = 'samsung';
+
+select avg(price) from smartphones
+where brand_name = 'xiaomi';
+
+select sum(price) from smartphones
+where brand_name = 'samsung';
+
+select count(*) from smartphones
+where brand_name = 'xiaomi';
+
+select count(distinct(brand_name)) as num_of_brands from smartphones;
+
+select std(screen_size) from smartphones;
+
+select variance(screen_size) from smartphones;
+
+-- Scalar functions
+select abs(price - 100000) as temp from smartphones;
+
+select model, round(sqrt(resolution_width * resolution_width + resolution_height* resolution_height)/screen_size,3) as 'ppi' from smartphones;
+
+select distinct ceil(screen_size) from smartphones;
+select distinct floor(screen_size) from smartphones;
+
+select avg(battery_capacity), avg(primary_camera_rear) from smartphones
+where price >= 100000;
+
+select model from smartphones
+where has_5g = 'True';
+
+select avg(internal_memory) from smartphones
+where refresh_rate >= 120 and primary_camera_front >= 20;
+```
+
+## GROUPING AND SORTING
+```SQL
+select model,screen_size from smartphones
+where brand_name = 'samsung'
+order by screen_size desc
+limit 12 ;
+
+SELECT ROW_NUMBER() OVER (ORDER BY screen_size DESC) AS id, model, screen_size
+FROM smartphones
+WHERE brand_name = 'samsung'
+LIMIT 12;
+
+select model, num_front_cameras + num_rear_cameras as total_cameras from smartphones
+order by total_cameras desc;
+
+select model, round(sqrt(resolution_width*resolution_width + resolution_height*resolution_height)/screen_size) as ppi from smartphones
+order by ppi desc;
+
+select model, battery_capacity 
+from smartphones
+order by battery_capacity
+limit 1,1;
+
+select model,rating from smartphones
+where brand_name = 'apple'
+order by rating
+limit 1;
+
+select model,price from smartphones
+order by brand_name asc, price asc;
+
+
+-- grouping
+select brand_name, count(*) as num_phones,
+round(avg(price),2) as 'avg price',
+max(rating) as 'max rating',
+round(avg(screen_size),2) as 'avg screen size',
+avg(battery_capacity) as 'avg battery capacity'
+from smartphones
+group by brand_name
+order by num_phones desc
+limit 15;
+
+select has_5g,avg(price) as avg_price, avg(rating) as rating
+from smartphones
+group by has_5g;
+
+select brand_name, processor_brand, count(*) as num_phns, avg(primary_camera_rear) as avg_cam_res 
+from smartphones
+group by brand_name,processor_brand;
+
+select brand_name, round(avg(price)) as avg_price 
+from smartphones
+group by brand_name
+order by avg_price desc
+limit 5;
+
+select brand_name, round(avg(screen_size)) as avg_screen_size
+from smartphones
+group by brand_name
+order by avg_screen_size asc
+limit 1;
+
+select brand_name, count(*) as count 
+from smartphones
+where  has_nfc = 'True' and has_ir_blaster = 'True'
+group by brand_name
+order by count desc limit 1;
+
+select has_nfc, avg(price) as avg_price
+from smartphones
+where brand_name = 'samsung'
+group by has_nfc;
+
+select model, price
+from smartphones
+order by price desc limit 1;
+
+-- having
+select brand_name, count(*) as 'count', avg(price) as avg_price
+from smartphones
+group by brand_name
+having count > 20
+order by avg_price desc;
+
+select brand_name, count(*) as 'count', avg(rating) as avg_rating
+from smartphones
+group by brand_name
+having count > 20
+order by avg_rating desc;
+
+select brand_name, avg(ram_capacity) as avg_ram from smartphones
+where refresh_rate > 90 and fast_charging_available = 1
+group by brand_name
+having count(*) > 10
+order by avg_ram desc
+limit 3;
+
+select brand_name, avg(price) as avg_price
+from smartphones
+where has_5g = 'True'
+group by brand_name
+having count(*) > 10 and avg(rating) > 70;
+
+-- IPL DATASET
+select batter, sum(batsman_run) as runs
+from ipl_ball_by_ball_2008_2022
+group by batter
+order by runs desc limit 5;
+
+select batter, count(*) as num_sixes
+from ipl_ball_by_ball_2008_2022
+where batsman_run = 6
+group by batter
+order by num_sixes desc limit 1,1;
+
+select batter, sum(batsman_run) as score from ipl_ball_by_ball_2008_2022
+where batter = 'V Kohli'
+group by batter
+having score >= 100;
+
+select batter from ipl_ball_by_ball_2008_2022
+where ;
+
+select batter, sum(batsman_run) as runs_scored 
+from ipl_ball_by_ball_2008_2022
+group by batter
+having runs_scored >= 100
+order by runs_scored desc;
+
+
+select batter,sum(batsman_run) as runs_scored,count(batsman_run) as balls_faced, 
+round((sum(batsman_run)/count(batsman_run) ) * 100,2) as strike_rate
+from ipl_ball_by_ball_2008_2022
+group by batter
+having balls_faced > 1000
+order by strike_rate desc limit 5;
+
+```
