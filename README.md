@@ -350,3 +350,120 @@ having balls_faced > 1000
 order by strike_rate desc limit 5;
 
 ```
+
+# JOINS
+- In SQL (Structured Query Language), a join is a way to combine data
+from two or more database tables based on a related column between
+them.
+- Joins are used when we want to query information that is distributed
+across multiple tables in a database, and the information we need is
+not contained in a single table. 
+- By joining tables together, we can
+create a virtual table that contains all of the information we need for
+our query.
+
+Problems
+redundancy
+update anomaly, delete anomaly etc
+memory management
+Solved using normalization
+
+## Types of joins
+left join, right join, inner join, full outer join, cross join, self join
+
+- Cross Join
+
+    - In SQL, a cross join (also known as a Cartesian product) is a type of join that returns the Cartesian product of the two tables being joined.
+    - In other words, it returns all possible combinations of rows from the two tables.
+    - Cross joins are not commonly used in practice, but they can be useful in certain scenarios, such as generating test data or exploring all possible combinations of items in a product catalogue.
+    - However, it's important to be cautious when using cross joins with large tables, as they can generate a very large result set, which can be resource-intensive and slow to process. 
+- Inner Join
+
+    - In SQL, an inner join is a type of join operation that combines data from two or more tables based on a specified condition. 
+    
+    - The inner join returns only the rows from both tables that satisfy the specified condition, i.e., the matching rows.
+    
+    - When you perform an inner join on two tables, the result set will only contain rows where there is a match between the joining columns in both tables. If there is no match, then the row will not be included in the result set.
+
+- Left Join
+
+    - A left join, also known as a left outer join, is a type of SQL join operation that returns all the rows from the left table (also known as the "first" table) and matching rows from the right table (also known as the "second" table). 
+    
+    - If there are no matching rows in the right table, the result will contain NULL values in the columns that come from the right table.
+    
+    - In other words, a left join combines the rows from both tables based on a common column, but it also includes all the rows from the left table, even if there are no matches in the right table. 
+    
+    - This is useful when you want to include all the records from the first table, but only some records from the second table.
+
+- Right Join
+
+    - A right join, also known as a right outer join, is a type of join operation in SQL that returns all the rows from the right table and matching rows from the left table. 
+    - If there are no matches in the left table, the result will still contain all the rows from the right table, with NULL values for the columns from the left table.
+
+- Full Outer Join
+
+    - A full outer join, sometimes called a full join, is a type of join operation in SQL that returns all matching rows from both the left and right tables, as well as any non-matching rows from either table. 
+    - In other words, a full outer join returns all the rows from both tables and matches rows with common values in the specified columns, and fills in NULL values for columns where there is no match.
+
+```sql
+-- Tables (assuming these tables already exist in your database)
+
+CREATE TABLE Products (
+  ProductID INT PRIMARY KEY,
+  Name VARCHAR(255),
+  Category VARCHAR(255)
+);
+
+CREATE TABLE Orders (
+  OrderID INT PRIMARY KEY,
+  CustomerID INT,
+  ProductID INT,
+  FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+);
+
+-- Insert sample data (replace with your actual data if needed)
+
+INSERT INTO Products (ProductID, Name, Category)
+VALUES (1, 'Laptop', 'Electronics'),
+       (2, 'Phone', 'Electronics'),
+       (3, 'Headphones', 'Electronics'),
+       (4, 'T-Shirt', 'Clothing'),
+       (5, 'Jeans', 'Clothing');
+
+INSERT INTO Orders (OrderID, CustomerID, ProductID)
+VALUES (100, 1, 1),
+       (200, 2, 2),
+       (300, 1, 3);
+
+-- Cross Join
+SELECT 'Cross Join' AS JoinType, p.Name, o.OrderID
+FROM Products p
+CROSS JOIN Orders o;
+
+-- Inner Join
+SELECT 'Inner Join' AS JoinType, p.Name, o.OrderID
+FROM Products p
+INNER JOIN Orders o ON p.ProductID = o.ProductID;
+
+-- Right Join
+SELECT 'Right Join' AS JoinType, p.Name, o.OrderID
+FROM Products p
+RIGHT JOIN Orders o ON p.ProductID = o.ProductID;
+
+-- Left Join
+SELECT 'Left Join' AS JoinType, p.Name, o.OrderID
+FROM Products p
+LEFT JOIN Orders o ON p.ProductID = o.ProductID;
+
+-- Full Outer Join
+SELECT 'Full Outer Join' AS JoinType, p.Name, o.OrderID
+FROM Products p
+FULL OUTER JOIN Orders o ON p.ProductID = o.ProductID;
+
+-- Self Join (Example: Find products in the same category)
+SELECT 'Self Join' AS JoinType, p1.Name AS Product1, p2.Name AS Product2
+FROM Products p1
+INNER JOIN Products p2 ON p1.Category = p2.Category AND p1.ProductID <> p2.ProductID;
+
+
+```
